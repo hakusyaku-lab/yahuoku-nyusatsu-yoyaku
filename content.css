@@ -1,0 +1,32 @@
+#yyk-panel {
+  position: fixed; right: 16px; bottom: 16px; z-index: 2147483646;
+  width: 280px; background: #fff; color: #222; border: 2px solid #e8590c; border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.2); font: 13px/1.5 "Meiryo", "Yu Gothic UI", sans-serif;
+}
+#yyk-panel .yyk-head { display: flex; justify-content: space-between; align-items: center; background: #e8590c; color: #fff; padding: 6px 10px; border-radius: 7px 7px 0 0; }
+#yyk-panel .yyk-x { background: none; border: 0; color: #fff; font-size: 16px; cursor: pointer; padding: 0 4px; }
+#yyk-panel.yyk-min .yyk-body { display: none; }
+#yyk-panel .yyk-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+#yyk-panel label { display: flex; flex-direction: column; gap: 3px; font-weight: bold; }
+#yyk-panel label.yyk-check { flex-direction: row; align-items: center; gap: 6px; font-weight: normal; }
+#yyk-panel input[type=number], #yyk-panel input[type=datetime-local], #yyk-panel select {
+  font: inherit; font-weight: normal; padding: 5px 6px; border: 1px solid #bbb; border-radius: 6px; background: #fff; color: #222;
+}
+#yyk-panel #yyk-go { background: #e8590c; color: #fff; border: 0; border-radius: 6px; padding: 8px; font: inherit; font-weight: bold; cursor: pointer; }
+#yyk-panel #yyk-go:hover { background: #d9480f; }
+#yyk-panel .yyk-note { padding: 6px 8px; border-radius: 6px; font-size: 12px; }
+#yyk-panel .yyk-on { background: #e7f5ff; color: #1864ab; }
+#yyk-panel .yyk-warn { background: #fff4e6; color: #a6420a; }
+#yyk-panel .yyk-red { color: #c92a2a; font-weight: normal; }
+#yyk-panel .yyk-small { font-size: 11px; color: #666; }
+#yyk-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 2147483647;
+  background: #e8590c; color: #fff; text-align: center; padding: 8px; font: bold 14px "Meiryo", sans-serif;
+}
+#yyk-panel .yyk-amt { display: flex; gap: 4px; }
+#yyk-panel .yyk-amt input { flex: 1; min-width: 0; font-size: 15px; font-weight: bold; }
+#yyk-panel .yyk-step { width: 32px; border: 1px solid #bbb; background: #f8f9fa; color: #222; border-radius: 6px; font: inherit; font-size: 16px; cursor: pointer; }
+#yyk-panel .yyk-step:hover { background: #ffe8cc; }
+#yyk-panel .yyk-link { background: none; border: 0; color: #1c7ed6; text-decoration: underline; cursor: pointer; font: inherit; font-size: 11px; padding: 0 0 0 6px; }
+#yyk-panel .yyk-end { background: #ffe3e3; color: #c92a2a; font-weight: bold; }
+#yyk-panel #yyk-go:disabled { background: #adb5bd; cursor: not-allowed; }

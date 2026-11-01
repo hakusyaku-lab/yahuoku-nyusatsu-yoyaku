@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "ヤフオク入札予約",
+  "version": "1.4.0",
+  "description": "ヤフオクの商品を「終了◯秒前に◯円で入札」と予約して、自動で入札します。",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "power"
+  ],
+  "host_permissions": [
+    "https://*.auctions.yahoo.co.jp/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "ヤフオク入札予約",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.auctions.yahoo.co.jp/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+# main に送る（プッシュする）たびに自動で動きます。
+#  1. 書き間違いがないかチェック
+#  2. manifest.json のバージョンがまだ公開されていなければ、
+#     Chrome・Edge用 / Firefox用 のZIPを作って Releases に公開
+#
+# 新しい版を出すときは、manifest.json の version を上げて CHANGELOG.md に書き、main に送るだけです。
+
+name: チェックと自動公開
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: 書き間違いチェック
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8'))"
+          for f in background.js content.js popup.js; do node --check "$f"; done
+      - name: ZIPを作る
+        run: python3 scripts/build_zip.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  release:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: バージョンを確認
+        id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          VERSION=$(node -p "require('./manifest.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" -R "$REPO" >/dev/null 2>&1; then
+            echo "v$VERSION は公開済みなので、今回は公開しません"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: 更新内容を CHANGELOG.md から取り出す
+        if: steps.ver.outputs.publish == 'true'
+        run: |
+          awk -v v="### ${{ steps.ver.outputs.version }}" '
+            (index($0, v "（") == 1 || $0 == v || index($0, v " ") == 1) { on = 1; next }
+            on && (/^### / || /^## /) { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md に「### ${{ steps.ver.outputs.version }}」の項目がありません"; exit 1
+          fi
+          {
+            echo
+            echo "---"
+            echo "**Chrome・Edge・Brave など**：YahuokuNyusatsuYoyaku.zip を展開して「展開して読み込み」"
+            echo "**Firefox**：YahuokuNyusatsuYoyaku-firefox.zip（about:debugging から一時読み込み）"
+          } >> notes.md
+      - name: Releases に公開
+        if: steps.ver.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release create "v${{ steps.ver.outputs.version }}" \
+            dist/YahuokuNyusatsuYoyaku.zip dist/YahuokuNyusatsuYoyaku-firefox.zip \
+            -R "$REPO" --title "ヤフオク入札予約 ${{ steps.ver.outputs.version }}" \
+            --notes-file notes.md --target "${{ github.sha }}" --latest
